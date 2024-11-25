@@ -1,0 +1,457 @@
+METRLA:
+  num_nodes: 207
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.7
+  val_size: 0.1
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.0003
+  milestones: [20,30]
+  lr_decay_rate: 0.1
+  batch_size: 16
+  max_epochs: 200
+  early_stop: 30
+  use_cl: False
+  cl_step_size: 2500
+  #clip_grad: 5
+
+  model_args:
+    num_nodes: 207
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 288
+    input_dim: 3
+    output_dim: 1
+    input_embedding_dim: 24
+    tod_embedding_dim: 24
+    dow_embedding_dim: 24
+    adaptive_embedding_dim: 80
+    dropout_a: 0.3
+
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 40
+    D_m: 152
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+PEMSBAY:
+  num_nodes: 325
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.7
+  val_size: 0.1
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.0001
+  milestones: [10, 30]
+  lr_decay_rate: 0.1
+  batch_size: 16
+  max_epochs: 300
+  early_stop: 20
+  use_cl: False
+
+  model_args:
+    num_nodes: 325
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 288
+    input_dim: 3
+    output_dim: 1
+    input_embedding_dim: 36
+    tod_embedding_dim: 36
+    dow_embedding_dim: 36
+    adaptive_embedding_dim: 12
+    dropout_a: 0.3
+
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 40
+    D_m: 120
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+PEMS03:
+  num_nodes: 358
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.0015
+  milestones: [30, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 32
+  max_epochs: 300
+  early_stop: 30
+  use_cl: False
+  cl_step_size: 2500
+
+
+  model_args:
+    num_nodes: 358
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 288
+    input_dim: 1
+    output_dim: 1
+    input_embedding_dim: 36
+    tod_embedding_dim: 36
+    dow_embedding_dim: 0
+    adaptive_embedding_dim: 12
+    dropout_a: 0.5
+
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 40
+    D_m: 84
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+PEMS04:
+  num_nodes: 307
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.0015
+  milestones: [30, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 32
+  max_epochs: 100
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+
+  model_args:
+    num_nodes: 307
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 288
+    input_dim: 1
+    output_dim: 1
+    input_embedding_dim: 24
+    tod_embedding_dim: 24
+    dow_embedding_dim: 24
+    adaptive_embedding_dim: 12
+    dropout_a: 0.1
+
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 64
+    D_m: 84
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+PEMS07:
+  num_nodes: 883
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.001 #0。001
+  milestones: [30, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 16
+  max_epochs: 100
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+
+  model_args:
+    num_nodes: 883
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 288
+    input_dim: 3
+    output_dim: 1
+    input_embedding_dim: 36   #36
+    tod_embedding_dim: 36
+    dow_embedding_dim: 36
+    adaptive_embedding_dim: 12
+    dropout_a: 0.3  #0.3
+
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 40
+    D_m: 120
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+PEMS08:
+  num_nodes: 170
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.0015
+  milestones: [30, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 32
+  max_epochs: 100
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+
+
+  model_args:
+    num_nodes: 170
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 288
+    input_dim: 1
+    output_dim: 1
+    input_embedding_dim: 24  #24
+    tod_embedding_dim: 24
+    dow_embedding_dim: 24
+    adaptive_embedding_dim: 12  # 12
+    dropout_a: 0.35
+    #mamba
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 40
+    D_m: 84
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+
+SD:
+  num_nodes: 716
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.003
+  milestones: [30, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 32
+  max_epochs: 100
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+
+  model_args:
+    num_nodes: 716
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 96
+    input_dim: 3
+    output_dim: 1
+    input_embedding_dim: 24
+    tod_embedding_dim: 24
+    dow_embedding_dim: 24
+    adaptive_embedding_dim: 12
+    dropout_a: 0.3
+
+    #mamba
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 40
+    D_m: 84
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+
+GBA:
+  num_nodes: 2352
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.002
+  milestones: [30, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 16
+  max_epochs: 100
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+
+  model_args:
+    num_nodes: 2352
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 96
+    input_dim: 3
+    output_dim: 1
+    input_embedding_dim: 24
+    tod_embedding_dim: 24
+    dow_embedding_dim: 24
+    adaptive_embedding_dim: 12
+    dropout_a: 0.3
+
+    #mamba
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 64
+    D_m: 84
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
+
+GLA:
+  num_nodes: 3834
+  in_steps: 12
+  out_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.002
+  milestones: [30, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 16
+  max_epochs: 100
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+
+  model_args:
+    num_nodes: 3834
+    in_steps: 12
+    out_steps: 12
+    steps_per_day: 96
+    input_dim: 3
+    output_dim: 1
+    input_embedding_dim: 24
+    tod_embedding_dim: 24
+    dow_embedding_dim: 24
+    adaptive_embedding_dim: 12
+    dropout_a: 0.5
+    #mamba
+    d_state: 8
+    d_conv: 4
+    expand: 2
+    dropout_m: 0.15
+    num_layers_ma: 1
+    # MLP
+    num_layers: 4
+    dropout: 0.1
+    # MSAM&STDMN
+    N_m: 64
+    D_m: 84
+    N_k: 40
+    conv_stride: 2
+    conv_k: 3
+    dim_k: 4
+
