@@ -1,0 +1,353 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.utils import weight_norm
+
+
+class CausalConv1d(nn.Module):
+    """
+    因果卷积层 - 确保时间序列的因果性
+    
+    Args:
+        in_channels (int): 输入通道数
+        out_channels (int): 输出通道数
+        kernel_size (int): 卷积核大小
+        dilation (int): 膨胀率
+        dropout (float): Dropout率
+    """
+    def __init__(self, in_channels, out_channels, kernel_size, dilation=1, dropout=0.2):
+        super(CausalConv1d, self).__init__()
+        
+        # 计算padding以保证因果性
+        self.padding = (kernel_size - 1) * dilation
+        
+        # 膨胀卷积层
+        self.conv = nn.Conv1d(
+            in_channels, out_channels, kernel_size,
+            padding=self.padding, dilation=dilation
+        )
+        
+        # 激活函数和dropout
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(dropout)
+        
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, in_channels, seq_len]
+        Returns:
+            out: [batch_size, out_channels, seq_len]
+        """
+        # 卷积操作
+        out = self.conv(x)
+        
+        # 裁剪右侧padding以保证因果性
+        if self.padding != 0:
+            out = out[:, :, :-self.padding]
+            
+        # 激活和dropout
+        out = self.relu(out)
+        out = self.dropout(out)
+        
+        return out
+
+
+class TemporalBlock(nn.Module):
+    """
+    TCN的基本时间块
+    
+    包含两个因果卷积层 + 残差连接
+    """
+    def __init__(self, in_channels, out_channels, kernel_size, dilation, dropout=0.2):
+        super(TemporalBlock, self).__init__()
+        
+        # 第一个因果卷积层
+        self.conv1 = CausalConv1d(
+            in_channels, out_channels, kernel_size, dilation, dropout
+        )
+        
+        # 第二个因果卷积层
+        self.conv2 = CausalConv1d(
+            out_channels, out_channels, kernel_size, dilation, dropout
+        )
+        
+        # 残差连接的维度匹配
+        self.downsample = nn.Conv1d(in_channels, out_channels, 1) if in_channels != out_channels else None
+        
+        # 最终激活
+        self.relu = nn.ReLU()
+        
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, in_channels, seq_len]
+        Returns:
+            out: [batch_size, out_channels, seq_len]
+        """
+        # 保存残差
+        residual = x
+        
+        # 两层卷积
+        out = self.conv1(x)
+        out = self.conv2(out)
+        
+        # 残差连接
+        if self.downsample is not None:
+            residual = self.downsample(residual)
+            
+        out += residual
+        return self.relu(out)
+
+
+class TCN(nn.Module):
+    """
+    完整的时间卷积网络（TCN）
+    
+    Args:
+        input_size (int): 输入特征维度
+        output_size (int): 输出特征维度
+        num_channels (list): 每层的通道数列表
+        kernel_size (int): 卷积核大小
+        dropout (float): Dropout率
+    """
+    def __init__(self, input_size, output_size, num_channels, kernel_size=2, dropout=0.2):
+        super(TCN, self).__init__()
+        
+        layers = []
+        num_levels = len(num_channels)
+        
+        for i in range(num_levels):
+            dilation_size = 2 ** i  # 指数增长的膨胀率
+            in_channels = input_size if i == 0 else num_channels[i-1]
+            out_channels = num_channels[i]
+            
+            layers.append(TemporalBlock(
+                in_channels, out_channels, kernel_size, dilation_size, dropout
+            ))
+            
+        self.network = nn.Sequential(*layers)
+        self.output_projection = nn.Linear(num_channels[-1], output_size)
+        
+    def forward(self, x):
+        """
+        Args:
+            x: [batch_size, seq_len, input_size] 或 [batch_size, input_size, seq_len]
+        Returns:
+            out: [batch_size, seq_len, output_size]
+        """
+        # 确保输入格式为 [batch_size, input_size, seq_len]
+        
+        x = x.transpose(1, 2)
+            
+        # TCN前向传播
+        y = self.network(x)  # [batch_size, num_channels[-1], seq_len]
+        
+        # 转置并投影到输出维度
+        y = y.transpose(1, 2)  # [batch_size, seq_len, num_channels[-1]]
+        out = self.output_projection(y)  # [batch_size, seq_len, output_size]
+        
+        return out
+
+
+if __name__ == "__main__":
+    x = torch.randn(1, 12*170, 64)
+    tcn = TCN(64, 64, [64], 3, 0.2)
+    output = tcn(x)
+
+    #打印tcn的参数
+    for name, param in tcn.named_parameters():
+        print(name, param.shape)
+
+    # 打印总参数
+    # total_params = sum(p.numel() for p in tcn.parameters())
+    total_params = sum(p .numel()for p in tcn.parameters())
+    print(f"Total parameters: {total_params}")
+
+    
+    print(output.shape)
+# import torch
+# import torch.nn as nn
+# import torch.nn.functional as F
+# from torch.nn.utils import weight_norm
+
+
+# class CausalConv1d(nn.Module):
+#     """
+#     改进的因果卷积层 - 针对交通流预测优化
+#     """
+#     def __init__(self, in_channels, out_channels, kernel_size, dilation=1, dropout=0.1, use_weight_norm=False):
+#         super(CausalConv1d, self).__init__()
+        
+#         # 计算padding以保证因果性
+#         self.padding = (kernel_size - 1) * dilation
+        
+#         # 膨胀卷积层 - 可选择是否使用weight_norm
+#         conv = nn.Conv1d(
+#             in_channels, out_channels, kernel_size,
+#             padding=self.padding, dilation=dilation
+#         )
+        
+#         if use_weight_norm:
+#             self.conv = weight_norm(conv)
+#         else:
+#             self.conv = conv
+            
+#         # 批归一化稳定训练
+#         self.norm = nn.BatchNorm1d(out_channels)
+        
+#         # 使用SiLU激活函数
+#         self.activation = nn.GELU()  # 更稳定than ReLU
+        
+#         # Dropout
+#         self.dropout = nn.Dropout(dropout)
+        
+#         # 参数初始化
+#         self._init_weights()
+        
+#     def _init_weights(self):
+#         """改进的权重初始化"""
+#         nn.init.kaiming_normal_(self.conv.weight, mode='fan_out', nonlinearity='relu')
+#         if hasattr(self.conv, 'bias') and self.conv.bias is not None:
+#             nn.init.constant_(self.conv.bias, 0)
+        
+#     def forward(self, x):
+#         """
+#         Args:
+#             x: [batch_size, in_channels, seq_len]
+#         Returns:
+#             out: [batch_size, out_channels, seq_len]
+#         """
+#         # 卷积操作
+#         out = self.conv(x)
+        
+#         # 裁剪右侧padding以保证因果性
+#         if self.padding != 0:
+#             out = out[:, :, :-self.padding]
+            
+#         # 归一化 -> 激活 -> dropout
+#         out = self.norm(out)
+#         out = self.activation(out)
+#         out = self.dropout(out)
+        
+#         return out
+
+
+# class TemporalBlock(nn.Module):
+#     """
+#     改进的时间块 - 添加更好的数值稳定性
+#     """
+#     def __init__(self, in_channels, out_channels, kernel_size, dilation, dropout=0.1):
+#         super(TemporalBlock, self).__init__()
+        
+#         # 第一个因果卷积层
+#         self.conv1 = CausalConv1d(
+#             in_channels, out_channels, kernel_size, dilation, dropout, use_weight_norm=False
+#         )
+        
+#         # 第二个因果卷积层
+#         self.conv2 = CausalConv1d(
+#             out_channels, out_channels, kernel_size, dilation, dropout, use_weight_norm=False
+#         )
+        
+#         # 残差连接的维度匹配
+#         if in_channels != out_channels:
+#             self.downsample = nn.Sequential(
+#                 nn.Conv1d(in_channels, out_channels, 1),
+#                 nn.BatchNorm1d(out_channels)
+#             )
+#         else:
+#             self.downsample = None
+            
+#         # 最终激活
+#         self.activation = nn.GELU()
+        
+#         # 添加残差连接权重
+#         self.alpha = nn.Parameter(torch.ones(1))
+        
+#     def forward(self, x):
+#         """
+#         Args:
+#             x: [batch_size, in_channels, seq_len]
+#         Returns:
+#             out: [batch_size, out_channels, seq_len]
+#         """
+#         # 保存残差
+#         residual = x
+        
+#         # 两层卷积
+#         out = self.conv1(x)
+#         out = self.conv2(out)
+        
+#         # 残差连接
+#         if self.downsample is not None:
+#             residual = self.downsample(residual)
+            
+#         # 加权残差连接，提高稳定性
+#         out = self.alpha * out + residual
+        
+#         return self.activation(out)
+
+
+# class TCN(nn.Module):
+#     """
+#     稳定的TCN - 专门针对交通流预测优化
+#     """
+#     def __init__(self, input_size, output_size, num_channels, kernel_size=3, dropout=0.1, max_dilation=None):
+#         super(TCN, self).__init__()
+        
+#         layers = []
+#         num_levels = len(num_channels)
+        
+#         # 限制最大膨胀率，避免过度膨胀导致的数值问题
+#         if max_dilation is None:
+#             max_dilation = min(2**(num_levels-1), 16)  # 限制最大膨胀率为16
+        
+#         for i in range(num_levels):
+#             dilation_size = min(2 ** i, max_dilation)  # 限制膨胀率
+#             in_channels = input_size if i == 0 else num_channels[i-1]
+#             out_channels = num_channels[i]
+            
+#             layers.append(TemporalBlock(
+#                 in_channels, out_channels, kernel_size, dilation_size, dropout
+#             ))
+            
+#         self.network = nn.Sequential(*layers)
+        
+#         # 更稳定的输出层
+#         self.output_projection = nn.Sequential(
+#             nn.Linear(num_channels[-1], num_channels[-1] // 2),
+#             nn.SiLU(),
+#             nn.Dropout(dropout),
+#             nn.Linear(num_channels[-1] // 2, output_size)
+#         )
+        
+#         # 输出范围限制（交通流合理范围）
+#         self.output_clamp = False
+        
+#     def forward(self, x):
+#         """
+#         Args:
+#             x: [batch_size, seq_len, input_size]
+#         Returns:
+#             out: [batch_size, seq_len, output_size]
+#         """
+#         # 检查输入是否有异常值
+#         if torch.isnan(x).any() or torch.isinf(x).any():
+#             print("Warning: NaN or Inf detected in input!")
+#             x = torch.nan_to_num(x, nan=0.0, posinf=1e6, neginf=-1e6)
+        
+#         # 确保输入格式为 [batch_size, input_size, seq_len]
+#         x = x.transpose(1, 2)
+            
+#         # TCN前向传播
+#         y = self.network(x)  # [batch_size, num_channels[-1], seq_len]
+        
+#         # 转置并投影到输出维度
+#         y = y.transpose(1, 2)  # [batch_size, seq_len, num_channels[-1]]
+#         out = self.output_projection(y)  # [batch_size, seq_len, output_size]
+        
+#         # 输出范围限制（可选）
+#         if self.output_clamp:
+#             out = torch.clamp(out, min=-10, max=200)  # 根据交通流数据调整
+        
+#         return out
