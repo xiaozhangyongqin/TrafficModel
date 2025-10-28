@@ -1,7 +1,7 @@
-METRLA:
-  num_nodes: 207
-  in_steps: 12
-  out_steps: 12
+KSYLDATA:
+  num_nodes: 5
+  input_steps: 60  # 原 in_steps
+  output_steps: 60  # 原 out_steps
 
   train_size: 0.7
   val_size: 0.1
@@ -13,7 +13,7 @@ METRLA:
   weight_decay: 0.0003
   milestones: [20,30]
   lr_decay_rate: 0.1
-  batch_size: 16
+  batch_size: 32
   max_epochs: 200
   early_stop: 30
   use_cl: False
@@ -21,37 +21,87 @@ METRLA:
   #clip_grad: 5
 
   model_args:
-    num_nodes: 207
-    in_steps: 12
-    out_steps: 12
-    steps_per_day: 288
-    input_dim: 3
+    num_nodes: 5
+    input_steps: 60  # 原 in_steps
+    output_steps: 60  # 原 out_steps
+    steps_per_day: 1440
+    input_dim: 1
     output_dim: 1
     input_embedding_dim: 24
     tod_embedding_dim: 24
     dow_embedding_dim: 24
     adaptive_embedding_dim: 80
-    dropout_a: 0.3
+    dropout_adaptive: 0.3  # 原 dropout_a
 
     d_conv: 4
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
+    dropout_mamba: 0.15  # 原 dropout_m
+    num_mamba_layers: 1  # 原 num_layers_ma
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 40
-    D_m: 152
-    N_k: 40
+    dropout_rate: 0.1  # 原 dropout
+    # Memory parameters - 更清晰的命名
+    memory_slots: 10  # 原 N_m
+    memory_dim: 64  # 原 D_m
+    attention_slots: 10  # 原 N_k
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
+    conv_kernel: 3  # 原 conv_k
+    attention_dim: 4  # 原 dim_k
+
+METRLA:
+  num_nodes: 207
+  input_steps: 12
+  output_steps: 12
+
+  train_size: 0.7
+  val_size: 0.1
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.001
+  weight_decay: 0.0003
+  milestones: [20,30]
+  lr_decay_rate: 0.1
+  batch_size: 8
+  max_epochs: 200
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+  #clip_grad: 5
+
+  model_args:
+    num_nodes: 207
+    input_steps: 12
+    output_steps: 12
+    steps_per_day: 288
+    input_dim: 3
+    output_dim: 1
+    input_embedding_dim: 12
+    tod_embedding_dim: 12
+    dow_embedding_dim: 12
+    adaptive_embedding_dim: 12
+    dropout_adaptive: 0.3
+
+    d_conv: 8
+    expand: 2
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
+    # MLP
+    num_layers: 2
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 40
+    memory_dim: 48
+    attention_slots: 10
+    conv_stride: 2
+    conv_kernel: 3
+    attention_dim: 4
 
 PEMSBAY:
   num_nodes: 325
-  in_steps: 12
-  out_steps: 12
+  input_steps: 12
+  output_steps: 12
 
   train_size: 0.7
   val_size: 0.1
@@ -70,8 +120,8 @@ PEMSBAY:
 
   model_args:
     num_nodes: 325
-    in_steps: 12
-    out_steps: 12
+    input_steps: 12
+    output_steps: 12
     steps_per_day: 288
     input_dim: 3
     output_dim: 1
@@ -79,28 +129,28 @@ PEMSBAY:
     tod_embedding_dim: 36
     dow_embedding_dim: 36
     adaptive_embedding_dim: 12
-    dropout_a: 0.3
+    dropout_adaptive: 0.3
 
     d_state: 8
     d_conv: 4
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 40
-    D_m: 120
-    N_k: 40
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 10
+    memory_dim: 64
+    attention_slots: 10
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
+    conv_kernel: 3
+    attention_dim: 4
 
 PEMS03:
   num_nodes: 358
-  in_steps: 12
-  out_steps: 12
+  input_steps: 12
+  output_steps: 12
 
   train_size: 0.6
   val_size: 0.2
@@ -113,66 +163,15 @@ PEMS03:
   milestones: [30, 50, 70]
   lr_decay_rate: 0.1
   batch_size: 32
-  max_epochs: 300
-  early_stop: 30
-  use_cl: False
-  cl_step_size: 2500
-
-
-  model_args:
-    num_nodes: 358
-    in_steps: 12
-    out_steps: 12
-    steps_per_day: 288
-    input_dim: 1
-    output_dim: 1
-    input_embedding_dim: 36
-    tod_embedding_dim: 36
-    dow_embedding_dim: 0
-    adaptive_embedding_dim: 12
-    dropout_a: 0.5
-
-    d_state: 8
-    d_conv: 4
-    expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
-    # MLP
-    num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 40
-    D_m: 84
-    N_k: 40
-    conv_stride: 2
-    conv_k: 3
-    dim_k: 4
-
-PEMS04:
-  num_nodes: 307
-  in_steps: 12
-  out_steps: 12
-
-  train_size: 0.6
-  val_size: 0.2
-
-  time_of_day: True
-  day_of_week: True
-
-  lr: 0.001
-  weight_decay: 0.0015
-  milestones: [30, 50, 70]
-  lr_decay_rate: 0.1
-  batch_size: 32
-  max_epochs: 100
+  max_epochs: 1
   early_stop: 20
   use_cl: False
   cl_step_size: 2500
 
   model_args:
-    num_nodes: 307
-    in_steps: 12
-    out_steps: 12
+    num_nodes: 358
+    input_steps: 12
+    output_steps: 12
     steps_per_day: 288
     input_dim: 1
     output_dim: 1
@@ -180,28 +179,78 @@ PEMS04:
     tod_embedding_dim: 24
     dow_embedding_dim: 24
     adaptive_embedding_dim: 12
-    dropout_a: 0.1
+    dropout_adaptive: 0.35
 
-    d_state: 8
-    d_conv: 4
+    d_state: 2
+    d_conv: 2
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 64
-    D_m: 84
-    N_k: 40
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 32
+    memory_dim: 24
+    attention_slots: 8
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
+    conv_kernel: 3
+    attention_dim: 4
+
+PEMS04:
+  num_nodes: 307
+  input_steps: 12
+  output_steps: 12
+
+  train_size: 0.6
+  val_size: 0.2
+
+  time_of_day: True
+  day_of_week: True
+
+  lr: 0.01
+  weight_decay: 0.001
+  milestones: [15, 50, 70]
+  lr_decay_rate: 0.1
+  batch_size: 32
+  max_epochs: 1
+  early_stop: 20
+  use_cl: False
+  cl_step_size: 2500
+
+  model_args:
+    num_nodes: 307
+    input_steps: 12
+    output_steps: 12
+    steps_per_day: 288
+    input_dim: 1
+    output_dim: 1
+    input_embedding_dim: 24
+    tod_embedding_dim: 24
+    dow_embedding_dim: 24
+    adaptive_embedding_dim: 12
+    dropout_adaptive: 0.35
+
+    d_state: 6
+    d_conv: 2
+    expand: 2
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
+    # MLP
+    num_layers: 4
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 30
+    memory_dim: 24
+    attention_slots: 8
+    conv_stride: 2
+    conv_kernel: 3
+    attention_dim: 4
 
 PEMS07:
   num_nodes: 883
-  in_steps: 12
-  out_steps: 12
+  input_steps: 12
+  output_steps: 12
 
   train_size: 0.6
   val_size: 0.2
@@ -210,48 +259,48 @@ PEMS07:
   day_of_week: True
 
   lr: 0.001
-  weight_decay: 0.001 #0。001
+  weight_decay: 0.001
   milestones: [30, 50, 70]
   lr_decay_rate: 0.1
-  batch_size: 16
-  max_epochs: 100
+  batch_size: 8
+  max_epochs: 1
   early_stop: 20
   use_cl: False
   cl_step_size: 2500
 
   model_args:
     num_nodes: 883
-    in_steps: 12
-    out_steps: 12
+    input_steps: 12
+    output_steps: 12
     steps_per_day: 288
     input_dim: 3
     output_dim: 1
-    input_embedding_dim: 36   #36
-    tod_embedding_dim: 36
-    dow_embedding_dim: 36
+    input_embedding_dim: 32
+    tod_embedding_dim: 32
+    dow_embedding_dim: 32
     adaptive_embedding_dim: 12
-    dropout_a: 0.3  #0.3
+    dropout_adaptive: 0.35
 
-    d_state: 8
-    d_conv: 4
+    d_state: 2
+    d_conv: 2
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 40
-    D_m: 120
-    N_k: 40
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 64
+    memory_dim: 24
+    attention_slots: 8
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
+    conv_kernel: 3
+    attention_dim: 4
 
 PEMS08:
   num_nodes: 170
-  in_steps: 12
-  out_steps: 12
+  input_steps: 12
+  output_steps: 12
 
   train_size: 0.6
   val_size: 0.2
@@ -259,51 +308,49 @@ PEMS08:
   time_of_day: True
   day_of_week: True
 
-  lr: 0.001
+  lr: 0.01
   weight_decay: 0.0015
-  milestones: [30, 50, 70]
+  milestones: [15, 50, 70]
   lr_decay_rate: 0.1
   batch_size: 32
-  max_epochs: 100
+  max_epochs: 1
   early_stop: 20
   use_cl: False
   cl_step_size: 2500
 
-
   model_args:
     num_nodes: 170
-    in_steps: 12
-    out_steps: 12
+    input_steps: 12
+    output_steps: 12
     steps_per_day: 288
     input_dim: 1
     output_dim: 1
-    input_embedding_dim: 24  #24
+    input_embedding_dim: 24
     tod_embedding_dim: 24
     dow_embedding_dim: 24
-    adaptive_embedding_dim: 12  # 12
-    dropout_a: 0.35
-    #mamba
-    d_state: 8
-    d_conv: 4
+    adaptive_embedding_dim: 12
+    dropout_adaptive: 0.5
+    # Mamba parameters
+    d_state: 6
+    d_conv: 2
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 40
-    D_m: 84
-    N_k: 40
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 64
+    memory_dim: 24
+    attention_slots: 8
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
-
+    conv_kernel: 3
+    attention_dim: 4
 
 SD:
   num_nodes: 716
-  in_steps: 12
-  out_steps: 12
+  input_steps: 12
+  output_steps: 12
 
   train_size: 0.6
   val_size: 0.2
@@ -311,9 +358,9 @@ SD:
   time_of_day: True
   day_of_week: True
 
-  lr: 0.001
-  weight_decay: 0.003
-  milestones: [30, 50, 70]
+  lr: 0.01
+  weight_decay: 0.01
+  milestones: [10, 50, 70]
   lr_decay_rate: 0.1
   batch_size: 32
   max_epochs: 100
@@ -323,8 +370,8 @@ SD:
 
   model_args:
     num_nodes: 716
-    in_steps: 12
-    out_steps: 12
+    input_steps: 12
+    output_steps: 12
     steps_per_day: 96
     input_dim: 3
     output_dim: 1
@@ -332,30 +379,29 @@ SD:
     tod_embedding_dim: 24
     dow_embedding_dim: 24
     adaptive_embedding_dim: 12
-    dropout_a: 0.3
+    dropout_adaptive: 0.35
 
-    #mamba
-    d_state: 8
-    d_conv: 4
+    # Mamba parameters
+    d_state: 2
+    d_conv: 2
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 40
-    D_m: 84
-    N_k: 40
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 40
+    memory_dim: 24
+    attention_slots: 8
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
-
+    conv_kernel: 3
+    attention_dim: 4
 
 GBA:
   num_nodes: 2352
-  in_steps: 12
-  out_steps: 12
+  input_steps: 12
+  output_steps: 12
 
   train_size: 0.6
   val_size: 0.2
@@ -364,10 +410,10 @@ GBA:
   day_of_week: True
 
   lr: 0.001
-  weight_decay: 0.002
+  weight_decay: 0.005
   milestones: [30, 50, 70]
   lr_decay_rate: 0.1
-  batch_size: 16
+  batch_size: 1
   max_epochs: 100
   early_stop: 20
   use_cl: False
@@ -375,8 +421,8 @@ GBA:
 
   model_args:
     num_nodes: 2352
-    in_steps: 12
-    out_steps: 12
+    input_steps: 12
+    output_steps: 12
     steps_per_day: 96
     input_dim: 3
     output_dim: 1
@@ -384,31 +430,29 @@ GBA:
     tod_embedding_dim: 24
     dow_embedding_dim: 24
     adaptive_embedding_dim: 12
-    dropout_a: 0.3
+    dropout_adaptive: 0.3
 
-    #mamba
+    # Mamba parameters
     d_state: 8
     d_conv: 4
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
-
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 64
-    D_m: 84
-    N_k: 40
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 64
+    memory_dim: 84
+    attention_slots: 40
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
-
+    conv_kernel: 3
+    attention_dim: 4
 
 GLA:
   num_nodes: 3834
-  in_steps: 12
-  out_steps: 12
+  input_steps: 12
+  output_steps: 12
 
   train_size: 0.6
   val_size: 0.2
@@ -417,10 +461,10 @@ GLA:
   day_of_week: True
 
   lr: 0.001
-  weight_decay: 0.002
+  weight_decay: 0.005
   milestones: [30, 50, 70]
   lr_decay_rate: 0.1
-  batch_size: 16
+  batch_size: 1
   max_epochs: 100
   early_stop: 20
   use_cl: False
@@ -428,8 +472,8 @@ GLA:
 
   model_args:
     num_nodes: 3834
-    in_steps: 12
-    out_steps: 12
+    input_steps: 12
+    output_steps: 12
     steps_per_day: 96
     input_dim: 3
     output_dim: 1
@@ -437,21 +481,20 @@ GLA:
     tod_embedding_dim: 24
     dow_embedding_dim: 24
     adaptive_embedding_dim: 12
-    dropout_a: 0.5
-    #mamba
+    dropout_adaptive: 0.5
+    # Mamba parameters
     d_state: 8
     d_conv: 4
     expand: 2
-    dropout_m: 0.15
-    num_layers_ma: 1
+    dropout_mamba: 0.15
+    num_mamba_layers: 1
     # MLP
     num_layers: 4
-    dropout: 0.1
-    # MSAM&STDMN
-    N_m: 64
-    D_m: 84
-    N_k: 40
+    dropout_rate: 0.1
+    # Memory parameters
+    memory_slots: 64
+    memory_dim: 84
+    attention_slots: 40
     conv_stride: 2
-    conv_k: 3
-    dim_k: 4
-
+    conv_kernel: 3
+    attention_dim: 4
