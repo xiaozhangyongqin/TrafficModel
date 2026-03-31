@@ -145,7 +145,7 @@ def get_dataloader_from_index_data(
     )
 
     # return train_dataloader, val_dataloader, test_dataloader, adj_mx, scaler
-    adj_mx = np.eye(170)
+    adj_mx = np.eye(n)
     return train_dataloader, val_dataloader, test_dataloader, scaler, adj_mx
 
 
@@ -159,5 +159,4 @@ if __name__ == "__main__":
     data_path = "../data/PEMS08/adj_mx.pkl"
     data = load_pkl(data_path)
     print(data)
-
 

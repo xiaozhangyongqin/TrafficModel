@@ -9,8 +9,8 @@ import torch.nn.functional as F
 import os
 import sys
 
-from pscan import pscan
-from tcnlayer import TCN
+from .pscan import pscan
+from .tcnlayer import TCN
 
 """
 
@@ -460,4 +460,3 @@ class RMSNorm(nn.Module):
         else:
             return output
     
-

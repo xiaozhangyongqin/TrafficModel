@@ -1,4 +1,3 @@
-from turtle import mode
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -145,4 +144,3 @@ if __name__ == "__main__":
     x = torch.randn(32, 12, 170, 64)
     out = model(x)
     print(out.shape)
-
