@@ -478,6 +478,11 @@ def main():
     
     dataset = args.dataset.upper()
     data_path = f"../data/{dataset}"
+    if not os.path.isdir(data_path):
+        raise FileNotFoundError(
+            f"Dataset directory not found: {data_path}. "
+            f"Please place data files under ../data/{dataset}/"
+        )
     
     # Load configuration
     with open("TrafficModel.yaml", "r", encoding="utf-8") as f:
@@ -513,7 +518,7 @@ def main():
         supports = [torch.tensor(adj_matrix).to(device) for adj_matrix in adj_matrices]
         
         # Create model
-        model = partial(TrafficModel, supports=None)
+        model = partial(TrafficModel, supports=supports)
         model = model(**config["model_args"])
         model = model.to(device)
         
